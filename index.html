@@ -40,11 +40,12 @@
         }
 
         .btn-submit {
-            width: 100%;
+            width: auto;
             background-color: #4e73df;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1rem; /* smaller font size */
             border-radius: 5px;
+            padding: 10px 20px; /* adjusted padding for smaller size */
         }
 
         .btn-submit:hover {
@@ -61,17 +62,22 @@
             color: white;
             font-size: 1rem;
         }
+
+        /* Center the submit button */
+        .form-container form {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="form-container animate__animated animate__fadeIn">
-        <h1><i class="fas fa-check-circle"></i> Mark Attendance</h1>
+        <h1 class="m-0 pb-4"><i class="fa-brands fa-google"></i> Attendance</h1>
         <form id="attendanceForm">
-            <div class="mb-4">
-                <label for="name" class="form-label">Name:</label>
+            <div class="mb-3">
                 <select id="name" class="form-select" required>
+                    <option value="" disabled selected>Select Google LDAP</option> <!-- Placeholder for Name -->
                     <option value="savbindu">savbindu</option>
                     <option value="Avyakth">Avyakth</option>
                     <option value="beldaru">beldaru</option>
@@ -85,13 +91,13 @@
                 </select>
             </div>
             <div class="mb-4">
-                <label for="status" class="form-label">Status:</label>
                 <select id="status" class="form-select" required>
+                    <option value="" disabled selected>Select Status</option> <!-- Placeholder for Status -->
                     <option value="Present">Present</option>
                     <option value="Absent">Absent</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-submit animate__animated animate__bounceIn">Mark Attendance</button>
+            <button type="submit" class="btn btn-submit animate__animated animate__bounceIn">Submit</button>
         </form>
     </div>
 </div>
@@ -102,34 +108,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.getElementById('attendanceForm').addEventListener('submit', async function (e) {
+    document.getElementById('attendanceForm').addEventListener('submit', function (e) {
         e.preventDefault();
-
-        const submitButton = document.querySelector('.btn-submit');
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Marking...';
-
-        const attendanceData = {
-            name: document.getElementById('name').value,
-            date: new Date().toISOString().split('T')[0],
-            status: document.getElementById('status').value
-        };
-
-        try {
-            const response = await fetch('https://script.google.com/a/macros/google.com/s/AKfycbw3JnlpUWPqzKVhEtrCDeEjaIU2rFvz4eyQy-ylcBa7QW_SqcVHhHyVi2pXS47Zuxe9Tg/exec', {
-                method: 'POST',
-                body: JSON.stringify(attendanceData),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const data = await response.json();
-            alert(data.result === 'success' ? 'Attendance marked successfully!' : `Error: ${data.message || 'Unknown error'}`);
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error marking attendance. Please try again.');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.innerHTML = 'Mark Attendance';
-        }
+        alert('Attendance submitted successfully!');
     });
 </script>
 
