@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Sheet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+    }
+
+    .present {
+      background-color: green;
+      color: white;
+    }
+
+    .absent {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Monthly Attendance Sheet</h1>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <!-- Day columns will be added here dynamically -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Student rows will be added here dynamically -->
+    </tbody>
+  </table>
+  <script>
+    const students = [
+      "avbindu", "Avyakth", "beldaru", "hindol", "khanKulsum",
+      "mprabahar", "nguite", "pmukhopadhyay", "rmacwan", "vrlakshmi"
+    ];
+
+    const daysInMonth = 30; // Adjust as needed
+
+    window.onload = () => {
+      const table = document.getElementById('attendanceTable');
+      const headerRow = table.querySelector('thead tr');
+
+      // Generate day columns
+      for (let i = 1; i <= daysInMonth; i++) {
+        const th = document.createElement('th');
+        th.innerText = `Day ${i}`;
+        headerRow.appendChild(th);
+      }
+
+      const tbody = table.querySelector('tbody');
+
+      // Generate student rows
+      students.forEach(student => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        nameCell.innerText = student;
+        row.appendChild(nameCell);
+
+        // Generate attendance buttons for each day
+        for (let i = 1; i <= daysInMonth; i++) {
+          const cell = document.createElement('td');
+          const button = document.createElement('button');
+          button.innerText = 'Absent';
+          button.classList.add('absent');
+          button.onclick = () => toggleAttendance(button);
+          cell.appendChild(button);
+          row.appendChild(cell);
+        }
+
+        tbody.appendChild(row);
+      });
+    };
+
+    function toggleAttendance(button) {
+      if (button.classList.contains('absent')) {
+        button.classList.remove('absent');
+        button.classList.add('present');
+        button.innerText = 'Present';
+      } else {
+        button.classList.remove('present');
+        button.classList.add('absent');
+        button.innerText = 'Absent';
+      }
+    }
+  </script>
+</body>
+</html>
