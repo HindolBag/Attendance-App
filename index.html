@@ -36,20 +36,23 @@
         h1 {
             text-align: center;
             font-size: 2.5rem;
-            color: #4e73df;
+            color: #000000;
         }
 
         .btn-submit {
-            width: auto;
-            background-color: #4e73df;
+            width: 100%;
+            background-color: #000000;
             color: white;
-            font-size: 1rem; /* smaller font size */
-            border-radius: 5px;
-            padding: 10px 20px; /* adjusted padding for smaller size */
+            font-size: 1rem;
+            border-radius: 10px;
+            padding: 10px 20px;
+            border: none;
+            transition: background-color 0.3s ease;
         }
 
         .btn-submit:hover {
-            background-color: #3b5bdb;
+            background-color: #bbbbbb;
+            color: black;
         }
 
         footer {
@@ -57,7 +60,7 @@
             bottom: 0;
             width: 100%;
             text-align: center;
-            background: #4e73df;
+            background: #000000;
             padding: 10px;
             color: white;
             font-size: 1rem;
@@ -77,7 +80,7 @@
         <form id="attendanceForm">
             <div class="mb-3">
                 <select id="name" class="form-select" required>
-                    <option value="" disabled selected>Select Google LDAP</option> <!-- Placeholder for Name -->
+                    <option value="" disabled selected>Select Google LDAP</option>
                     <option value="savbindu">savbindu</option>
                     <option value="Avyakth">Avyakth</option>
                     <option value="beldaru">beldaru</option>
@@ -85,14 +88,13 @@
                     <option value="khanKulsum">khanKulsum</option>
                     <option value="mprabahar">mprabahar</option>
                     <option value="nguite">nguite</option>
-                    <option value="pmukhopadhyay">pmukhopadhyay</option>
                     <option value="rmacwan">rmacwan</option>
                     <option value="vrlakshmi">vrlakshmi</option>
                 </select>
             </div>
             <div class="mb-4">
                 <select id="status" class="form-select" required>
-                    <option value="" disabled selected>Select Status</option> <!-- Placeholder for Status -->
+                    <option value="" disabled selected>Select Status</option>
                     <option value="Present">Present</option>
                     <option value="Absent">Absent</option>
                 </select>
