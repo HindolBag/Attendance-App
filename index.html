@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>G Attendance</title>
 
-  <!-- Bootstrap & Font Awesome -->
+  <!-- Bootstrap & Font Awesome for styling and icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <style>
+    /* Body styling to center content vertically and horizontally */
     body {
       background-color: #f8f9fa;
       min-height: 100vh;
@@ -18,21 +19,26 @@
       justify-content: center;
     }
 
+    /* Wrapper to limit card width */
     .card-wrapper {
       width: 100%;
       max-width: 600px;
     }
 
+    /* Card styling with shadow */
     .card {
       background-color: #ffffff;
       border: none !important;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      position: relative; /* Enables absolute elements if needed */
     }
 
+    /* Custom heading font size */
     .attendance-heading {
       font-size: 3.6rem;
     }
 
+    /* Footer styling fixed at bottom */
     footer {
       position: fixed;
       bottom: 0;
@@ -41,12 +47,17 @@
   </style>
 </head>
 <body>
+  <!-- Main container -->
   <div class="container">
     <div class="row justify-content-center">
       <div class="card-wrapper">
         <div class="card p-4 text-center">
+          <!-- Heading with Google icon -->
           <h1 class="mb-4 attendance-heading"><i class="fa-brands fa-google"></i> Attendance</h1>
+
+          <!-- Attendance Form -->
           <form id="attendanceForm" autocomplete="on">
+            <!-- Dropdown for selecting name -->
             <div class="mb-3">
               <select id="name" class="form-select" required autocomplete="name">
                 <option value="" disabled selected>Select Google LDAP</option>
@@ -61,6 +72,8 @@
                 <option value="vrlakshmi">vrlakshmi</option>
               </select>
             </div>
+
+            <!-- Dropdown for selecting status -->
             <div class="mb-3">
               <select id="status" class="form-select" required autocomplete="status">
                 <option value="" disabled selected>Select Status</option>
@@ -68,38 +81,75 @@
                 <option value="Absent">Absent</option>
               </select>
             </div>
+
+            <!-- Submit button -->
             <button type="submit" class="btn btn-outline-success w-100 p-1">Submit</button>
-            <p id="successMessage" class="text-success fw-bold mt-3 d-none">✔ Attendance submitted successfully!</p>
           </form>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Footer -->
   <footer class="bg-dark text-white text-center py-2">
     <p class="mb-0">Developed & Maintained by Hindol Bag</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.getElementById('attendanceForm').addEventListener('submit', function (e) {
-      e.preventDefault();
+  <!-- Modal shown after successful submission -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- Modal title -->
+          <h5 class="modal-title" id="successModalLabel">Attendance Status</h5>
+          <!-- X button to close the modal -->
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Modal body showing success -->
+        <div class="modal-body text-success">
+          ✔ Attendance marked successfully!
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript to handle form submission -->
+  <script>
+    // Handle form submit event
+    document.getElementById('attendanceForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevent page refresh
+
+      // Get values
       let name = document.getElementById('name').value;
       let status = document.getElementById('status').value;
-      let successMessage = document.getElementById('successMessage');
+      let submitButton = document.querySelector('button[type="submit"]');
 
+      // Disable form while submitting
+      submitButton.disabled = true;
+      document.getElementById('name').disabled = true;
+      document.getElementById('status').disabled = true;
+
+      // Validation check
       if (!name || !status) {
         alert("Please select both fields before submitting.");
+        submitButton.disabled = false;
+        document.getElementById('name').disabled = false;
+        document.getElementById('status').disabled = false;
         return;
       }
 
+      // Prepare form data to send
       let data = new FormData();
       data.append('name', name);
       data.append('status', status);
 
-      const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSa4JgSSIglwB3-8IcTVW9NWFcJn-ZP98krSDyPyF-8kALemh_pAtachuBn_C5hjZM/exec'; // Replace with your Web App URL
+      // Google Apps Script Web App URL
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSa4JgSSIglwB3-8IcTVW9NWFcJn-ZP98krSDyPyF-8kALemh_pAtachuBn_C5hjZM/exec';
 
+      // Send data to the script
       fetch(scriptUrl, {
         method: 'POST',
         body: data,
@@ -107,18 +157,28 @@
       .then(response => response.text())
       .then(result => {
         if (result === "Success") {
-          successMessage.classList.remove("d-none");
-          setTimeout(() => {
-            successMessage.classList.add("d-none");
-            document.getElementById('attendanceForm').reset();
-          }, 2000);
+          // Show success modal
+          var myModal = new bootstrap.Modal(document.getElementById('successModal'));
+          myModal.show();
+          document.getElementById('attendanceForm').reset(); // Reset form
         } else {
           alert("Error in submission.");
         }
       })
       .catch(error => {
         alert("There was an error, please try again.");
+      })
+      .finally(() => {
+        // Re-enable form inputs after request
+        submitButton.disabled = false;
+        document.getElementById('name').disabled = false;
+        document.getElementById('status').disabled = false;
       });
+    });
+
+    // Reset form when modal is closed using the "X"
+    document.querySelector('.btn-close').addEventListener('click', function () {
+      document.getElementById('attendanceForm').reset();
     });
   </script>
 </body>
