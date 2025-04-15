@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>G Attendance</title>
 
-  <!-- Bootstrap & Font Awesome -->
+  <!-- Bootstrap & Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+  <!-- Custom Styling -->
   <style>
-    /* Body Styling */
+    /* Full page light background and center-aligned content */
     body {
       background-color: #f8f9fa;
       min-height: 100vh;
@@ -19,13 +20,13 @@
       justify-content: center;
     }
 
-    /* Card container wrapper */
+    /* Wrapper to limit card width */
     .card-wrapper {
       width: 100%;
       max-width: 600px;
     }
 
-    /* Card Styling */
+    /* Card style with shadow */
     .card {
       background-color: #ffffff;
       border: none !important;
@@ -33,12 +34,12 @@
       position: relative;
     }
 
-    /* Attendance title */
+    /* Attendance title heading */
     .attendance-heading {
       font-size: 3.6rem;
     }
 
-    /* Sticky footer */
+    /* Sticky footer at bottom */
     footer {
       position: fixed;
       bottom: 0;
@@ -53,18 +54,17 @@
     <div class="row justify-content-center">
       <div class="card-wrapper">
         <div class="card p-4 text-center">
-          <!-- Header with icon -->
+          <!-- Page Title with Google Icon -->
           <h1 class="mb-4 attendance-heading">
             <i class="fa-brands fa-google"></i> Attendance
           </h1>
 
           <!-- Attendance Form -->
           <form id="attendanceForm" autocomplete="on">
-            <!-- Name Selection Dropdown -->
+            <!-- LDAP Name Dropdown -->
             <div class="mb-3">
               <select id="name" class="form-select" required>
                 <option value="" disabled selected>Select your LDAP</option>
-                <!-- Name options -->
                 <option value="savbindu">savbindu</option>
                 <option value="avyakth">avyakth</option>
                 <option value="beldaru">beldaru</option>
@@ -77,7 +77,7 @@
               </select>
             </div>
 
-            <!-- Status Selection Dropdown -->
+            <!-- Status Dropdown -->
             <div class="mb-3">
               <select id="status" class="form-select" required>
                 <option value="" disabled selected>Select your status</option>
@@ -94,21 +94,20 @@
     </div>
   </div>
 
-  <!-- Footer Section -->
+  <!-- Footer -->
   <footer class="bg-dark text-white text-center py-2">
     <p class="mb-0">Developed & Maintained by Hindol Bag</p>
   </footer>
 
-  <!-- Success Modal Popup -->
+  <!-- Modal: Displays after successful submission -->
   <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
-        <!-- Modal Header -->
         <div class="modal-header">
           <h5 class="modal-title" id="successModalLabel">Attendance Status</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <!-- Modal Body -->
+        <!-- Modal content dynamically updated -->
         <div class="modal-body text-success" id="modalContent">
           ✔ Attendance marked successfully!
         </div>
@@ -116,26 +115,26 @@
     </div>
   </div>
 
-  <!-- Bootstrap Bundle JS (includes Popper) -->
+  <!-- Bootstrap Bundle JS (with Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Attendance Submission Script -->
   <script>
-    // Handle form submission
+    // Handle attendance form submission
     document.getElementById('attendanceForm').addEventListener('submit', function (e) {
-      e.preventDefault(); // Prevent default form action
+      e.preventDefault(); // Prevent default form submission
 
-      // Get values
+      // Get selected name and status
       const name = document.getElementById('name').value;
       const status = document.getElementById('status').value;
       const submitButton = document.querySelector('button[type="submit"]');
 
-      // Disable fields while processing
+      // Disable form while processing
       submitButton.disabled = true;
       document.getElementById('name').disabled = true;
       document.getElementById('status').disabled = true;
 
-      // Double-check if both fields are selected
+      // Validation fallback in case HTML5 validation is bypassed
       if (!name || !status) {
         alert("Please select both fields before submitting.");
         submitButton.disabled = false;
@@ -144,14 +143,15 @@
         return;
       }
 
-      // Prepare data to send to Google Apps Script
+      // Prepare form data for POST
       const data = new FormData();
       data.append('name', name);
       data.append('status', status);
 
+      // Google Apps Script URL (handles backend sheet operations)
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSa4JgSSIglwB3-8IcTVW9NWFcJn-ZP98krSDyPyF-8kALemh_pAtachuBn_C5hjZM/exec';
 
-      // Send data using fetch API
+      // Submit attendance to backend
       fetch(scriptUrl, {
         method: 'POST',
         body: data,
@@ -159,31 +159,41 @@
       .then(response => response.text())
       .then(result => {
         if (result === "Success") {
-          // Show success modal with submitted data
-          const modalContent = document.getElementById('modalContent');
-          modalContent.innerHTML = `<strong>LDAP:</strong> ${name}<br><strong>Status:</strong> ${status}<br><br>✔ Attendance marked successfully!`;
+          // Format date for modal display
+          const today = new Date();
+          const formattedDate = today.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+          });
 
+          // Populate modal with submission info
+          const modalContent = document.getElementById('modalContent');
+          modalContent.innerHTML = `<strong>Date:</strong> ${formattedDate}<br><strong>LDAP:</strong> ${name}<br><strong>Status:</strong> ${status}<br><br>✔ Attendance marked successfully!`;
+
+          // Show modal
           const myModal = new bootstrap.Modal(document.getElementById('successModal'));
           myModal.show();
 
-          // Reset form after submission
+          // Reset the form
           document.getElementById('attendanceForm').reset();
         } else {
           alert("Error in submission.");
         }
       })
       .catch(() => {
+        // Handle network or server error
         alert("There was an error, please try again.");
       })
       .finally(() => {
-        // Re-enable fields
+        // Re-enable form elements after processing
         submitButton.disabled = false;
         document.getElementById('name').disabled = false;
         document.getElementById('status').disabled = false;
       });
     });
 
-    // Reset form when modal is manually closed
+    // Reset form when modal close button is clicked
     document.querySelector('.btn-close').addEventListener('click', function () {
       document.getElementById('attendanceForm').reset();
     });
