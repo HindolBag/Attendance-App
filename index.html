@@ -65,7 +65,6 @@
             <div class="mb-3">
               <select id="name" class="form-select" required>
                 <option value="" disabled selected>Select your LDAP</option>
-                <option value="savbindu">savbindu</option>
                 <option value="avyakth">avyakth</option>
                 <option value="beldaru">beldaru</option>
                 <option value="hindol">hindol</option>
@@ -73,6 +72,7 @@
                 <option value="mprabahar">mprabahar</option>
                 <option value="nguite">nguite</option>
                 <option value="rmacwan">rmacwan</option>
+                <option value="savbindu">savbindu</option>
                 <option value="vrlakshmi">vrlakshmi</option>
               </select>
             </div>
@@ -149,7 +149,7 @@
       data.append('status', status);
 
       // Google Apps Script URL (handles backend sheet operations)
-      const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSa4JgSSIglwB3-8IcTVW9NWFcJn-ZP98krSDyPyF-8kALemh_pAtachuBn_C5hjZM/exec';
+      const scriptUrl = '';
 
       // Submit attendance to backend
       fetch(scriptUrl, {
