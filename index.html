@@ -140,6 +140,7 @@
         submitButton.disabled = false;
         document.getElementById('name').disabled = false;
         document.getElementById('status').disabled = false;
+        document.getElementById('attendanceForm').reset(); // Reset form on error
         return;
       }
 
@@ -175,15 +176,17 @@
           const myModal = new bootstrap.Modal(document.getElementById('successModal'));
           myModal.show();
 
-          // Reset the form
+          // Reset the form after successful submission
           document.getElementById('attendanceForm').reset();
         } else {
           alert("Error in submission.");
+          document.getElementById('attendanceForm').reset(); // Reset form on error
         }
       })
       .catch(() => {
         // Handle network or server error
         alert("There was an error, please try again.");
+        document.getElementById('attendanceForm').reset(); // Reset form on error
       })
       .finally(() => {
         // Re-enable form elements after processing
