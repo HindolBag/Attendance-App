@@ -111,13 +111,22 @@
     document.getElementById('attendanceForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+
+      // Block attendance submission on weekends
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        showModal("❌ Attendance cannot be marked on weekends.", "danger");
+        resetForm();
+        return;
+      }
+
       const name = document.getElementById('name').value;
       const status = document.getElementById('status').value;
       const submitButton = document.querySelector('button[type="submit"]');
 
-      submitButton.disabled = true;
-      document.getElementById('name').disabled = true;
-      document.getElementById('status').disabled = true;
+      // Disable form fields while processing the request
+      toggleFormFields(true);
 
       if (!name || !status) {
         showModal("❌ Please select both LDAP and status.", "danger");
@@ -131,56 +140,66 @@
 
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbxl9ZU4egT-1_XajJQ3RII_iDQzpglL4W7_Z9ekdqmBZRUtq7-PpMXXKFFLTYlbd1Jf/exec';
 
+      // Sending attendance data to the Google Apps Script endpoint
       fetch(scriptUrl, {
         method: 'POST',
         body: data,
       })
       .then(response => response.text())
       .then(result => {
-        const today = new Date();
+        // Format the date in 'DD Month YYYY' format
         const formattedDate = today.toLocaleDateString('en-GB', {
           day: '2-digit',
           month: 'long',
           year: 'numeric'
         });
 
-        if (result === "Success") {
-          showModal(`
-            <div class="text-success">
-              <strong>Date:</strong> ${formattedDate}<br>
-              <strong>LDAP:</strong> ${name}<br>
-              <strong>Status:</strong> ${status}<br><br>
-              ✔ Attendance marked successfully!
-            </div>
-          `);
-        } else {
-          showModal(`
-            <div class="text-danger">
-              <strong>Date:</strong> ${formattedDate}<br>
-              <strong>LDAP:</strong> ${name}<br><br>
-              ❌ ${result}
-            </div>
-          `);
-        }
+        const message = result === "Success"
+          ? `<div class="text-success">
+               <strong>Date:</strong> ${formattedDate}<br>
+               <strong>LDAP:</strong> ${name}<br>
+               <strong>Status:</strong> ${status}<br><br>
+               ✔ Attendance marked successfully!
+             </div>`
+          : `<div class="text-danger">
+               <strong>Date:</strong> ${formattedDate}<br>
+               <strong>LDAP:</strong> ${name}<br><br>
+               ❌ ${result}
+             </div>`;
 
+        showModal(message);
         document.getElementById('attendanceForm').reset();
       })
       .catch(() => {
-        showModal(`
-          <div class="text-danger">❌ There was a network or server error. Please try again.</div>
-        `);
+        // Display error message if there's a network or server issue
+        showModal(`<div class="text-danger">❌ There was a network or server error. Please try again.</div>`);
       })
       .finally(() => {
-        submitButton.disabled = false;
-        document.getElementById('name').disabled = false;
-        document.getElementById('status').disabled = false;
+        // Re-enable form fields after the request completes
+        toggleFormFields(false);
       });
     });
 
-    function showModal(messageHtml) {
+    // Function to toggle form field states (enabled/disabled)
+    function toggleFormFields(disabled) {
+      document.getElementById('name').disabled = disabled;
+      document.getElementById('status').disabled = disabled;
+      document.querySelector('button[type="submit"]').disabled = disabled;
+    }
+
+    // Function to display modal
+    function showModal(messageHtml, type = 'success') {
       document.getElementById('modalContent').innerHTML = messageHtml;
       const myModal = new bootstrap.Modal(document.getElementById('successModal'));
       myModal.show();
+    }
+
+    // Function to reset form and re-enable fields
+    function resetForm() {
+      // Reset the form
+      document.getElementById('attendanceForm').reset();
+      // Re-enable form fields after displaying the modal
+      toggleFormFields(false);
     }
   </script>
 </body>
